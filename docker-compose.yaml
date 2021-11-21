@@ -1,0 +1,73 @@
+version: '3.7'
+
+services:
+
+  nginx-sirius:
+    container_name: nginx-sirius
+    hostname: nginx-sirius
+    image: nginx:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx_config.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - user_db
+      - user_db_test
+
+  user_service:
+    container_name: user_service
+    hostname: user_service
+    build: user_service/
+    command: uvicorn src.main:app --reload --host 0.0.0.0 --port 8010
+    volumes:
+      - ./user_service/:/app/
+    networks:
+      - sirius-network
+    ports:
+      - 8010:8010
+    depends_on:
+      - user_db
+  
+  user_db:
+    image: postgres
+    hostname: users_db
+    environment:
+      POSTGRES_PASSWORD: "users_db_pwd"
+      POSTGRES_USER: "sirius_user_postgres"
+      POSTGRES_DB: "users_db"
+    ports:
+      - "15432:5432"
+    volumes:
+      - postgres-user-service:/var/lib/postgresql/data1
+    networks:
+      - sirius-network
+
+  user_db_test:
+    image: postgres
+    hostname: users_db_test
+    environment:
+      POSTGRES_PASSWORD: "test_password_user_db"
+      POSTGRES_USER: "test_db_test"
+      POSTGRES_DB: "users_db_test"
+    ports:
+      - "15433:5432"
+    volumes:
+      - postgres-user-service-test:/var/lib/postgresql/data1
+    networks:
+      - sirius-network
+
+networks: 
+  sirius-network:
+    name: sirius-network
+    driver: bridge
+
+volumes:
+  user-service:
+    name: user-service
+    external: true
+  postgres-user-service:
+    name: postgres-user-service
+    external: true
+  postgres-user-service-test:
+    name: postgres-user-service-test
+    external: true
