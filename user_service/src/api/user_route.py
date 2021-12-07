@@ -20,7 +20,7 @@ user_route = APIRouter()
 
 
 @user_route.post("/users/", response_model=User)
-def add_user(user: UserCreate, db: Session = Depends(get_db)) -> User:
+def post(user: UserCreate, db: Session = Depends(get_db)) -> User:
     db_user: User = get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
@@ -29,7 +29,7 @@ def add_user(user: UserCreate, db: Session = Depends(get_db)) -> User:
 
 
 @user_route.get("/users/{user_id}", response_model=User)
-def get_user_by_id(user_id: int, db: Session = Depends(get_db)) -> User:
+def get(user_id: int, db: Session = Depends(get_db)) -> User:
     db_user: User = get_user(db=db, user_id=user_id)
     if not db_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -39,13 +39,13 @@ def get_user_by_id(user_id: int, db: Session = Depends(get_db)) -> User:
 
 
 @user_route.get("/users/", response_model=List[User])
-def list_users(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)) -> list[User]:
+def get_list(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)) -> list[User]:
     db_user: list[User] = get_users(db=db, skip=skip, limit=limit)
     return db_user
 
 
 @user_route.put("/users/", response_model=User)
-def mod_user(user: UserUpdate, db: Session = Depends(get_db)) -> User:
+def put(user: UserUpdate, db: Session = Depends(get_db)) -> User:
     db_user: User = get_user_by_email(db=db, email=user.email)
     if not db_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
@@ -68,7 +68,7 @@ def mod_user(user: UserUpdate, db: Session = Depends(get_db)) -> User:
 
 
 @user_route.delete("/users/")
-def delete_user(user: UserDelete, db: Session = Depends(get_db)) -> str:
+def delete(user: UserDelete, db: Session = Depends(get_db)) -> str:
     db_user = get_user_by_email(db=db, email=user.email)
     if not db_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")

@@ -4,7 +4,6 @@ from sqlalchemy.orm import sessionmaker
 from .config import get_database_uri
 
 SQLALCHEMY_DATABASE_URI = get_database_uri()
-#SQLALCHEMY_DATABASE_URI
 
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
 

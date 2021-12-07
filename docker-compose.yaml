@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.8'
 
 services:
 
@@ -56,6 +56,39 @@ services:
     networks:
       - sirius-network
 
+  group-db:
+    image: mongo:latest #:5.0-focal
+    hostname: group_db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=passwordD21
+      - MONGO_INITDB_DATABASE=groups
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-group-service:/var/lib/mongo/data1
+    networks:
+      - sirius-network
+
+  group-db-ui:
+      image: mongo-express
+      hostname: group-db-ui
+      environment:
+        - ME_CONFIG_BASICAUTH_USERNAME=admin
+        - ME_CONFIG_BASICAUTH_PASSWORD=passwordD21
+        - ME_CONFIG_MONGODB_PORT=27017
+        - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
+        - ME_CONFIG_MONGODB_ADMINPASSWORD=passwordD21
+        - ME_CONFIG_MONGODB_SERVER=group-db
+      links:
+        - group-db
+      ports:
+        - "8081:8081"
+      networks:
+        - sirius-network
+      depends_on:
+        - group-db
+
 networks: 
   sirius-network:
     name: sirius-network
@@ -70,4 +103,7 @@ volumes:
     external: true
   postgres-user-service-test:
     name: postgres-user-service-test
+    external: true
+  mongo-group-service:
+    name: mongo-group-service
     external: true

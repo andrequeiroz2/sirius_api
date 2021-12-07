@@ -5,7 +5,9 @@ from app.db import Base, engine
 
 Base.metadata.create_all(bind=engine)
 
-app: FastAPI = FastAPI(openapi_url="/api/v1/user/openapi.json", docs_url="/api/v1/user/docs")
+app: FastAPI = FastAPI(
+    openapi_url="/api/v1/user/openapi.json",
+    docs_url="/api/v1/user/docs")
 
 app.include_router(user_route, tags=['users'])
 
